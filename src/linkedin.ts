@@ -4,6 +4,7 @@ interface PostData {
   displayName: string;
   avatarBase64: string;
   content: string;
+  imageDataUri?: string;
 }
 
 export async function renderLinkedInPost(data: PostData): Promise<Buffer> {
@@ -28,7 +29,7 @@ export async function renderLinkedInPost(data: PostData): Promise<Buffer> {
   }
 }
 
-function buildHtml({ displayName, avatarBase64, content }: PostData): string {
+function buildHtml({ displayName, avatarBase64, content, imageDataUri }: PostData): string {
   const escapedContent = content
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -110,6 +111,13 @@ function buildHtml({ displayName, avatarBase64, content }: PostData): string {
     white-space: pre-wrap;
     word-break: break-word;
   }
+  .post-image {
+    margin: 0 -16px 0 -16px;
+  }
+  .post-image img {
+    width: 100%;
+    display: block;
+  }
   .divider {
     height: 1px;
     background: rgba(0,0,0,0.08);
@@ -153,6 +161,8 @@ function buildHtml({ displayName, avatarBase64, content }: PostData): string {
 
   <div class="content"><span class="intro">Cher réseau,</span>
 ${escapedContent}</div>
+
+  ${imageDataUri ? `<div class="post-image"><img src="${imageDataUri}" alt=""></div>` : ""}
 
   <div class="divider"></div>
 

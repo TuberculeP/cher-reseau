@@ -9,9 +9,7 @@ import { renderLinkedInPost } from "./linkedin.js";
 async function buildPostImage(message: Message): Promise<Buffer> {
   const author = message.author;
   const displayName =
-    (message.member?.displayName) ??
-    author.displayName ??
-    author.username;
+    message.member?.displayName ?? author.displayName ?? author.username;
 
   const avatarBase64 = await fetch(
     author.displayAvatarURL({ extension: "png", size: 256 })
@@ -19,7 +17,19 @@ async function buildPostImage(message: Message): Promise<Buffer> {
     .then((r) => r.arrayBuffer())
     .then((buf) => Buffer.from(buf).toString("base64"));
 
-  return renderLinkedInPost({ displayName, avatarBase64, content: message.content });
+  let imageDataUri: string | undefined;
+  const attachment = message.attachments.find((a) =>
+    a.contentType?.startsWith("image/")
+  );
+  if (attachment) {
+    const mimeType = attachment.contentType!.split(";")[0].trim();
+    const imageBase64 = await fetch(attachment.url)
+      .then((r) => r.arrayBuffer())
+      .then((buf) => Buffer.from(buf).toString("base64"));
+    imageDataUri = `data:${mimeType};base64,${imageBase64}`;
+  }
+
+  return renderLinkedInPost({ displayName, avatarBase64, content: message.content, imageDataUri });
 }
 
 export function startBot(token: string) {
