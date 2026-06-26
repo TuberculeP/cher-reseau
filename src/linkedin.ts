@@ -1,4 +1,10 @@
 import puppeteer from "puppeteer";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
+const fontsDir = join(process.cwd(), "fonts");
+const fontRegular = readFileSync(join(fontsDir, "inter-400.woff2")).toString("base64");
+const fontSemiBold = readFileSync(join(fontsDir, "inter-600.woff2")).toString("base64");
 
 interface PostData {
   displayName: string;
@@ -40,10 +46,20 @@ function buildHtml({ displayName, avatarBase64, content, imageDataUri }: PostDat
 <head>
 <meta charset="utf-8">
 <style>
+  @font-face {
+    font-family: "Inter";
+    font-weight: 400;
+    src: url("data:font/woff2;base64,${fontRegular}") format("woff2");
+  }
+  @font-face {
+    font-family: "Inter";
+    font-weight: 600;
+    src: url("data:font/woff2;base64,${fontSemiBold}") format("woff2");
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     background: #f3f2ef;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: "Inter", sans-serif;
     padding: 16px;
     width: 680px;
   }
